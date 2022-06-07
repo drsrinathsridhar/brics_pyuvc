@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     print('Available capture modes:', cap.available_modes)
     print('Device name:', cap.name)
-    # cap.bandwidth_factor = 0.5
+    cap.bandwidth_factor = 0.5
     print('Bandwidth factor:', cap.bandwidth_factor)
     # Uncomment the following lines to configure the Pupil 200Hz IR cameras:
     controls_dict = dict([(c.display_name, c) for c in cap.controls])
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     assert len(cap.available_modes) > 0
 
-    cap.frame_mode = cap.available_modes[-1]
+    cap.frame_mode = cap.available_modes[0]
     print('Using capture mode:', cap.frame_mode)
 
     while True:

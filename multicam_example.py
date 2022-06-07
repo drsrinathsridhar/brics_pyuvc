@@ -26,7 +26,7 @@ def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
     Shape = ImageList[0].shape
     for Ctr, Image in enumerate(ImageList, 0):
         if len(FPSList) == len(ImageList):
-            cv2.putText(img=Image, text=str(math.floor(FPSList[Ctr])), org=(Image.shape[1]-math.floor(Image.shape[1]/10), math.floor(Image.shape[1]/10)),
+            cv2.putText(img=Image, text=str(math.floor(FPSList[Ctr])), org=(Image.shape[1]-math.floor(Image.shape[1]/20), math.floor(Image.shape[1]/25)),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(0, 0, 255), thickness=2)
         if Shape[0] != Image.shape[0] or Shape[1] != Image.shape[1]:
             Image = cv2.resize(Image, Shape)
@@ -56,12 +56,14 @@ if __name__ == '__main__':
     # dev_list = [dev_list[0]]
     nCams = len(dev_list)
     print('Found {} cameras.'.format(nCams))
+    nCams = 6
+    print('WARNING: Limiting to {} cameras.'.format(nCams))
     Cams = []
-    for i in range(len(dev_list)):
+    for i in range(nCams):
         Cams.append(uvc.Capture(dev_list[i]["uid"]))
         print('Supported modes:', Cams[i].avaible_modes)
-        Cams[i].frame_mode = Cams[i].avaible_modes[-1]
-        # Cams[i].bandwidth_factor = 1.5
+        Cams[i].frame_mode = Cams[i].avaible_modes[1]
+        Cams[i].bandwidth_factor = 0.9
 
     CapturedFrames = [None]*nCams
     DummyImage = np.empty((Cams[i].frame_mode[1], Cams[i].frame_mode[0], 3))
@@ -99,7 +101,7 @@ if __name__ == '__main__':
                     for frame in CapturedFrames:
                         if frame is not None:
                             ImageList.append(frame.img)
-                    Collage = makeCollage(ImageList, MaxWidth=1200, FPSList=FPS)
+                    Collage = makeCollage(ImageList, MaxWidth=1600, FPSList=FPS)
                 cv2.imshow('Live Capture', Collage)
             else:
                 cv2.imshow('Live Capture', DummyImage)
