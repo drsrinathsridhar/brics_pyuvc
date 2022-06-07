@@ -61,6 +61,7 @@ if __name__ == '__main__':
         Cams.append(uvc.Capture(dev_list[i]["uid"]))
         print('Supported modes:', Cams[i].avaible_modes)
         Cams[i].frame_mode = Cams[i].avaible_modes[-1]
+        # Cams[i].bandwidth_factor = 1.5
 
     CapturedFrames = [None]*nCams
     DummyImage = np.empty((Cams[i].frame_mode[1], Cams[i].frame_mode[0], 3))

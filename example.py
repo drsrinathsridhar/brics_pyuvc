@@ -9,13 +9,14 @@ if __name__ == '__main__':
 
     dev_list = uvc.device_list()
     print(dev_list)
-    cap = uvc.Capture(dev_list[0]["uid"])
+    cap = uvc.Capture(dev_list[1]["uid"])
     if cap is None:
         print('No compatible UVC devices found. Exiting.')
         exit()
 
     print('Available capture modes:', cap.available_modes)
     print('Device name:', cap.name)
+    # cap.bandwidth_factor = 0.5
     print('Bandwidth factor:', cap.bandwidth_factor)
     # Uncomment the following lines to configure the Pupil 200Hz IR cameras:
     controls_dict = dict([(c.display_name, c) for c in cap.controls])
