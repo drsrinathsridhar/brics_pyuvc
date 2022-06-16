@@ -77,11 +77,12 @@ if __name__ == '__main__':
         Cams.append(uvc.Capture(dev_list[i]["uid"]))
         controls_dict = dict([(c.display_name, c) for c in Cams[-1].controls])
         print('Camera in Bus:ID -', dev_list[i]['uid'], 'supports the following modes:', Cams[-1].avaible_modes)
-        Cams[-1].frame_mode = Cams[-1].avaible_modes[-1]
-        Cams[-1].bandwidth_factor = 2
+        for Key in dev_list[i].keys():
+            print(Key + ':', dev_list[i][Key])
+        Cams[-1].frame_mode = Cams[-1].avaible_modes[1]
+        Cams[-1].bandwidth_factor = 0.88
         # time.sleep(1.0)
 
-    print(len(Cams))
     DummyFrame = np.zeros((Cams[0].frame_mode[1], Cams[0].frame_mode[0], 3))
     CapturedFrames = [DummyFrame]*nCams
     Stop = False
