@@ -25,3 +25,5 @@ Then do
 -D WITH_GTK=ON \
 -D BUILD_opencv_python2=OFF \
 -D BUILD_opencv_python3=OFF \
+-D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.6m.so \
+-D PYTHON3_INCLUDE
