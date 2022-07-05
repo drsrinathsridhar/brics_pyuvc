@@ -26,4 +26,9 @@ Then do
 -D BUILD_opencv_python2=OFF \
 -D BUILD_opencv_python3=OFF \
 -D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.6m.so \
--D PYTHON3_INCLUDE
+-D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.6m \
+-D PYTHON3_EXECUTABLE=$ENV_PATH/bin/python \
+-D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python3.6/site-packages \
+-D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.6/site-packages/numpy/core/include \
+-D WITH_GSTREAMER=OFF \
+..`
