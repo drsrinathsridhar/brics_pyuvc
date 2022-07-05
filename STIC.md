@@ -31,7 +31,7 @@ cmake \
 -D WITH_TIFF=OFF \
 -D WITH_GTK=ON \
 -D BUILD_opencv_python2=OFF \
--D BUILD_opencv_python3=OFF \
+-D BUILD_opencv_python3=ON \
 -D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.6m.so \
 -D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.6m \
 -D PYTHON3_EXECUTABLE=$ENV_PATH/bin/python \
