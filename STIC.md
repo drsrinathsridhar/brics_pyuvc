@@ -1,12 +1,14 @@
 Install Ubuntu 20.04.
 
-1. Install Anaconda
+## Install Anaconda and setup environment
 
-2. Setup an environment using anaconda and activate it.
+Setup an environment using anaconda and activate it.
 
 `conda create -n napier python=3.6`
 
-3. First build OpenCV 3.4+ with highgui and Python 3 support. Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python environment in your Anaconda (get it using `which python` when the environment is activated).
+## Build OpenCV
+
+First build OpenCV 3.4+ with highgui and Python 3 support. Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python environment in your Anaconda (get it using `which python` when the environment is activated).
 
 For instance, first run
 
@@ -32,3 +34,7 @@ Then do
 -D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.6/site-packages/numpy/core/include \
 -D WITH_GSTREAMER=OFF \
 ..`
+
+## Follow pyuvc instructions
+
+README.md
