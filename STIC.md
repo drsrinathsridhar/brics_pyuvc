@@ -8,7 +8,11 @@ Setup an environment using anaconda and activate it.
 
 ## Build OpenCV
 
-First build OpenCV 3.4+ with highgui and Python 3 support. Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python environment in your Anaconda (get it using `which python` when the environment is activated).
+First build OpenCV 3.4+ with highgui and Python 3 support. First install some prerequisites:
+
+`sudo apt install ffmpeg qt5-default libgtk2.0-dev libgtk-3-dev`
+
+Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python environment in your Anaconda (get it using `which python` when the environment is activated).
 
 For instance, first run
 
