@@ -8,7 +8,7 @@ Install Ubuntu 20.04.
 
 3. First build OpenCV 3.4+ with highgui and Python 3 support. Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python environment in your Anaconda (get it using `which python` when the environment is activated).
 
-For instance, first runnnnnnnn
+For instance, first run
 
 `ENV_PATH=/home/srinath/anaconda3/envs/napier`
 
