@@ -16,7 +16,7 @@ For instance, first run
 
 Then do
 
-```cmake \
+``cmake \
 -D CMAKE_BUILD_TYPE=RELEASE \
 -D CMAKE_INSTALL_PREFIX=/usr/local \
 -D INSTALL_PYTHON_EXAMPLES=ON \
@@ -33,7 +33,7 @@ Then do
 -D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python3.6/site-packages \
 -D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.6/site-packages/numpy/core/include \
 -D WITH_GSTREAMER=OFF \
-..```
+..``
 
 ## Follow pyuvc instructions
 
