@@ -21,6 +21,10 @@ For instance, first run
 Then do
 
 ```
+mkdir build
+
+cd build
+
 cmake \
 -D CMAKE_BUILD_TYPE=RELEASE \
 -D CMAKE_INSTALL_PREFIX=/usr/local \
@@ -39,6 +43,13 @@ cmake \
 -D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.6/site-packages/numpy/core/include \
 -D WITH_GSTREAMER=OFF \
 ..
+```
+
+After cmake completes succuessfully, run:
+
+```
+make -j 8
+sudo make install
 ```
 
 ## Follow pyuvc instructions
