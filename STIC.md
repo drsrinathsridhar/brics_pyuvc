@@ -12,6 +12,8 @@ First build OpenCV 3.4+ with highgui and Python 3 support. First install some pr
 
 `sudo apt install ffmpeg qt5-default libgtk2.0-dev libgtk-3-dev`
 
+(On Ubuntu 22.04 try `sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools` instead of `qt5-default`).
+
 Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python environment in your Anaconda (get it using `which python` when the environment is activated).
 
 For instance, first run
