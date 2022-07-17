@@ -1,6 +1,16 @@
 import sticradio
+import argparse
+import sys
+
+Parser = argparse.ArgumentParser(description='Example script to connect to a websocket ping/pong server.')
+Parser.add_argument('-h', '--hostname', help='Hostname or IP address.', type=str, default='localhost')
+Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8875')
 
 if __name__ == '__main__':
-    Client = sticradio.STICRadioClient(hostname='localhost', port='8875')
+    # if len(sys.argv) >= 1:
+    #     Parser.print_help()
+    #     exit()
+    Args = Parser.parse_args()
+
+    Client = sticradio.STICRadioClient(hostname=Args.hostname, port=Args.port)
     Client.start()
-    Client.stop()
