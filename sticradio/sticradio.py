@@ -4,7 +4,7 @@ import utilities as utils
 import time
 
 class STICRadioServer():
-    def __init__(self, port='8875'):
+    def __init__(self, port='80'):
         self.init(port)
 
     def init(self, port):
@@ -31,7 +31,7 @@ class STICRadioClient():
     def __init__(self, hostname, port):
         self.init(hostname, port)
 
-    def init(self, hostname='localhost', port='8875'):
+    def init(self, hostname='localhost', port='80'):
         self.Hostname = hostname
         self.Port = port
         self.URI = 'ws://' + self.Hostname + ':' + self.Port
