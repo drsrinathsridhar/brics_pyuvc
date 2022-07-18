@@ -4,7 +4,6 @@ import utilities as utils
 import time
 import numpy as np
 import struct
-import cv2
 
 class STICRadioServer():
     def __init__(self, port='80'):
@@ -59,8 +58,7 @@ class STICRadioClient():
                 ImageBytes = self.TestData.tobytes()
                 EpochTime = utils.getCurrentEpochTime()
                 SendData = struct.pack('Qs', EpochTime, ImageBytes)
-                # print('Sending Data:', EpochTime)
-                # await websocket.send(str(EpochTime))
+                # print('Sending data at:', EpochTime)
                 await websocket.send(SendData)
                 self.ReceivedData = await websocket.recv()
                 # print('Received Data:', self.ReceivedData)

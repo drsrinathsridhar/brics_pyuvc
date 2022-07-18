@@ -38,16 +38,16 @@ cmake \
 -D WITH_GTK=ON \
 -D BUILD_opencv_python2=OFF \
 -D BUILD_opencv_python3=ON \
--D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.7m.so \
--D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.7m \
 -D PYTHON3_EXECUTABLE=$ENV_PATH/bin/python \
+-D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.7m \
+-D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.7m.so \
 -D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python3.7/site-packages \
 -D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.7/site-packages/numpy/core/include \
 -D WITH_GSTREAMER=OFF \
 ..
 ```
 
-After cmake completes succuessfully, run:
+After cmake completes successfully, run:
 
 ```
 make -j 8
