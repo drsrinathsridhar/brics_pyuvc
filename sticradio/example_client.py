@@ -1,3 +1,20 @@
+# #!/usr/bin/env python
+#
+# import asyncio
+# import websockets
+#
+#
+# async def hello():
+#     print('Running client...')
+#     async with websockets.connect("ws://localhost:8765") as websocket:
+#         Message = 'Hello world!'
+#         print(Message)
+#         await websocket.send(Message)
+#         await websocket.recv()
+#
+#
+# asyncio.run(hello())
+
 import sticradio
 import argparse
 import sys

@@ -2,6 +2,9 @@ import asyncio
 import websockets
 import utilities as utils
 import time
+import numpy as np
+import struct
+import cv2
 
 class STICRadioServer():
     def __init__(self, port='80'):
@@ -9,23 +12,23 @@ class STICRadioServer():
 
     def init(self, port):
         self.Port = port
-        self.WSServer = None
-        self.create()
-
-    def create(self):
-        self.WSServer = websockets.serve(self.event_loop, 'localhost', self.Port)
-        print('[ INFO ]: Successfully created websocket server in port', self.Port)
+        self.TestData = np.random.rand(1920, 1080, 3)  # Simulating a full HD image
 
     async def event_loop(self, websocket, path):
         async for Data in websocket:
-            print('Data received from websocket:', Data)
-            await websocket.send(Data) # Send the data back
+            (EpochTime, ImagePayload) = struct.unpack('Qs', Data)
+            print('Data received from websocket:', EpochTime)
+            self.TestData = np.frombuffer(ImagePayload, dtype=np.uint8)
+            await websocket.send(str(EpochTime)) # Send only the epoch time back
+
+    async def main(self):
+        async with websockets.serve(self.event_loop, port=self.Port):
+            print('[ INFO ]: Successfully created websocket server in port', self.Port)
+            await asyncio.Future()  # run forever
 
     def start(self):
         print('[ INFO ]: Starting server...')
-        asyncio.get_event_loop().run_until_complete(self.WSServer)
-        asyncio.get_event_loop().run_forever()
-
+        asyncio.run(self.main())
 
 class STICRadioClient():
     def __init__(self, hostname, port):
@@ -38,6 +41,8 @@ class STICRadioClient():
         self.Websocket = None
         self.Terminate = False
         self.ReceivedData = None
+        # self.TestData = np.zeros((1920, 1080, 3), dtype=np.uint8) # Simulating a full HD image
+        self.TestData = np.random.uniform(low=0.0, high= 255.0, size=(1920, 1080, 3)).astype(np.uint8)  # Simulating a full HD image
 
     async def send(self, data):
         await self.Websocket.send(data)
@@ -50,17 +55,20 @@ class STICRadioClient():
         async with websockets.connect(self.URI) as websocket:
             print('[ INFO ]: Successfully connected to websocket server at', self.URI)
             while True:
-                time.sleep(1)
+                time.sleep(0.001)
+                ImageBytes = self.TestData.tobytes()
                 EpochTime = utils.getCurrentEpochTime()
-                print('Sending Data:', EpochTime)
-                await websocket.send(str(EpochTime))
+                SendData = struct.pack('Qs', EpochTime, ImageBytes)
+                # print('Sending Data:', EpochTime)
+                # await websocket.send(str(EpochTime))
+                await websocket.send(SendData)
                 self.ReceivedData = await websocket.recv()
-                print('Received Data:', self.ReceivedData)
+                # print('Received Data:', self.ReceivedData)
                 print('Latency: {} milliseconds'.format((utils.getCurrentEpochTime() - int(self.ReceivedData))/2000))
 
     def start(self):
         print('[ INFO ]: Starting client...')
-        asyncio.get_event_loop().run_until_complete(self.event_loop())
+        asyncio.run(self.event_loop())
 
     def stop(self):
         self.Terminate = True

@@ -4,7 +4,7 @@ Install Ubuntu 20.04.
 
 Setup an environment using anaconda and activate it.
 
-`conda create -n napier python=3.6`
+`conda create -n napier python=3.7`
 
 ## Build OpenCV
 
@@ -38,11 +38,11 @@ cmake \
 -D WITH_GTK=ON \
 -D BUILD_opencv_python2=OFF \
 -D BUILD_opencv_python3=ON \
--D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.6m.so \
--D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.6m \
+-D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.7m.so \
+-D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.7m \
 -D PYTHON3_EXECUTABLE=$ENV_PATH/bin/python \
--D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python3.6/site-packages \
--D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.6/site-packages/numpy/core/include \
+-D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python3.7/site-packages \
+-D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.7/site-packages/numpy/core/include \
 -D WITH_GSTREAMER=OFF \
 ..
 ```
