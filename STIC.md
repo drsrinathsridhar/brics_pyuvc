@@ -8,6 +8,10 @@ Setup an environment using anaconda and activate it.
 
 ## Build OpenCV
 
+Get OpenCV:
+
+`wget https://github.com/opencv/opencv/archive/3.4.16.zip`
+
 First build OpenCV 3.4+ with highgui and Python 3 support. First install some prerequisites:
 
 `sudo apt install ffmpeg qt5-default libgtk2.0-dev libgtk-3-dev`
