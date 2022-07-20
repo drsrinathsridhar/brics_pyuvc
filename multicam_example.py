@@ -14,6 +14,27 @@ import argparse, sys
 Parser = argparse.ArgumentParser(description='Sample script to stream from UVC cameras.')
 Parser.add_argument('-i', '--id', help='Which camera IDs to use.', nargs='+', type=int, required=False, default=[])
 
+class DummyLock():
+    def __init__(self):
+        pass
+    def acquire(self):
+        pass
+    def release(self):
+        pass
+
+class StreamingMovingAverage:
+    def __init__(self, window_size=100):
+        self.window_size = window_size
+        self.values = []
+        self.sum = 0
+
+    def __add__(self, value):
+        self.values.append(value)
+        self.sum += value
+        if len(self.values) > self.window_size:
+            self.sum -= self.values.pop(0)
+        return float(self.sum) / len(self.values)
+
 def getCurrentEpochTime():
     return int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() * 1e6)
 
@@ -24,8 +45,6 @@ def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
     nImages = len(ImageList)
     if nImages == 0:
         return None
-    if nImages == 1:
-        return ImageList[0]
 
     # Assuming images are all same size or we will resize to same size as the first image
     Shape = ImageList[0].shape
@@ -35,6 +54,9 @@ def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(0, 0, 255), thickness=2)
         if Shape[0] != Image.shape[0] or Shape[1] != Image.shape[1]:
             Image = cv2.resize(Image, Shape)
+
+    if nImages == 1:
+        return ImageList[0]
 
     nCols = math.ceil(math.sqrt(nImages))
     nRows = math.ceil(nImages / nCols)
@@ -79,14 +101,16 @@ if __name__ == '__main__':
         print('Camera in Bus:ID -', dev_list[i]['uid'], 'supports the following modes:', Cams[-1].avaible_modes)
         for Key in dev_list[i].keys():
             print(Key + ':', dev_list[i][Key])
-        Cams[-1].frame_mode = Cams[-1].avaible_modes[1]
-        Cams[-1].bandwidth_factor = 0.88
+        Cams[-1].frame_mode = Cams[-1].avaible_modes[0]
+        Cams[-1].bandwidth_factor = 1
         # time.sleep(1.0)
 
     DummyFrame = np.zeros((Cams[0].frame_mode[1], Cams[0].frame_mode[0], 3))
     CapturedFrames = [DummyFrame]*nCams
     Stop = False
     FPS = [0]*nCams
+    WindowSize = 200
+    FPSMovingAvg = [StreamingMovingAverage(window_size=WindowSize)]*nCams
     lock = threading.Lock()
     def grab_frame(num):
         global Stop
@@ -107,7 +131,8 @@ if __name__ == '__main__':
                 time.sleep(0.001)  # Prevent CPU throttling
                 ElapsedTime += 1000
             lock.acquire()
-            FPS[num] = 1e6 / (ElapsedTime)
+            CurrentFPS = 1e6 / (ElapsedTime)
+            FPS[num] = FPSMovingAvg[num] + CurrentFPS
             lock.release()
             # print('FPS:', num, math.floor(FPS[num]), flush=True)
 
@@ -121,7 +146,7 @@ if __name__ == '__main__':
         global CapturedFrames
         while True:
             lock.acquire()
-            Collage = makeCollage(CapturedFrames, MaxWidth=800, FPSList=FPS)
+            Collage = makeCollage(CapturedFrames, MaxWidth=1600, FPSList=FPS)
             # Collage = DummyFrame
             lock.release()
             cv2.imshow('Live Capture', Collage)
