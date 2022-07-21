@@ -17,7 +17,6 @@
 
 import sticradio
 import argparse
-import sys
 
 Parser = argparse.ArgumentParser(description='Example script to connect to a websocket ping/pong server.')
 Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', type=str, default='localhost')

@@ -54,7 +54,7 @@ class STICRadioClient():
         async with websockets.connect(self.URI) as websocket:
             print('[ INFO ]: Successfully connected to websocket server at', self.URI)
             while True:
-                time.sleep(0.001)
+                time.sleep(1/260.0)
                 ImageBytes = self.TestData.tobytes()
                 EpochTime = utils.getCurrentEpochTime()
                 SendData = struct.pack('Qs', EpochTime, ImageBytes)

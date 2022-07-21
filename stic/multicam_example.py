@@ -1,26 +1,20 @@
-from __future__ import print_function
-
-import random
 import numpy as np
-import uvc
 import logging
 import cv2
 import threading
 import time
 import math
 from datetime import datetime
-import argparse, sys
+import argparse
+import sys
+import os
+FileDirPath = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(FileDirPath, '..'))
+import uvc
+from sticradio.utilities import getCurrentEpochTime
 
 Parser = argparse.ArgumentParser(description='Sample script to stream from UVC cameras.')
 Parser.add_argument('-i', '--id', help='Which camera IDs to use.', nargs='+', type=int, required=False, default=[])
-
-class DummyLock():
-    def __init__(self):
-        pass
-    def acquire(self):
-        pass
-    def release(self):
-        pass
 
 class StreamingMovingAverage:
     def __init__(self, window_size=100):
@@ -34,9 +28,6 @@ class StreamingMovingAverage:
         if len(self.values) > self.window_size:
             self.sum -= self.values.pop(0)
         return float(self.sum) / len(self.values)
-
-def getCurrentEpochTime():
-    return int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() * 1e6)
 
 def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
     if ImageList is None:
@@ -101,9 +92,10 @@ if __name__ == '__main__':
         print('Camera in Bus:ID -', dev_list[i]['uid'], 'supports the following modes:', Cams[-1].avaible_modes)
         for Key in dev_list[i].keys():
             print(Key + ':', dev_list[i][Key])
-        Cams[-1].frame_mode = Cams[-1].avaible_modes[0]
-        Cams[-1].bandwidth_factor = 1
-        # time.sleep(1.0)
+        Cams[-1].frame_mode = Cams[-1].available_modes[0]
+        print('Original camera bandwidth factor:', Cams[-1].bandwidth_factor)
+        Cams[-1].bandwidth_factor = 0.8
+        print('New camera bandwidth factor:', Cams[-1].bandwidth_factor)
 
     DummyFrame = np.zeros((Cams[0].frame_mode[1], Cams[0].frame_mode[0], 3))
     CapturedFrames = [DummyFrame]*nCams
