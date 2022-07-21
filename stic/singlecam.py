@@ -10,21 +10,21 @@ sys.path.append(os.path.join(FileDirPath, '..'))
 import uvc
 from sticradio.utilities import getCurrentEpochTime, makeCollage, StreamingMovingAverage
 
-Parser = argparse.ArgumentParser(description='Sample script to stream from UVC cameras.')
-Parser.add_argument('-i', '--id', help='Which camera IDs to use.', nargs='+', type=int, required=False, default=[])
+Parser = argparse.ArgumentParser(description='Sample script to stream from a single UVC camera.')
+Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
 
-def grab_frame(num):
+def grab_frame():
     global Stop
     global FPS
     global FPSMovingAvg
     global lock
-    global CapturedFrames
-    global Cams
+    global CapturedFrame
+    global Cam
     while True:
         startTime = getCurrentEpochTime()
-        Frame = Cams[num].get_frame_robust()
+        Frame = Cam.get_frame_robust()
         lock.acquire()
-        CapturedFrames[num] = np.copy(Frame.img)
+        CapturedFrame = np.copy(Frame.img)
         lock.release()
         # CapturedFrames[num] = Cams[num].get_frame()
         # print("Cam: {} shape: {}".format(num, CapturedFrames[num].img.shape))
@@ -35,7 +35,7 @@ def grab_frame(num):
             ElapsedTime += 1000
         lock.acquire()
         CurrentFPS = 1e6 / (ElapsedTime)
-        FPS[num] = FPSMovingAvg[num] + CurrentFPS
+        FPS = FPSMovingAvg + CurrentFPS
         lock.release()
         # print('FPS:', num, math.floor(FPS[num]), flush=True)
 
@@ -49,7 +49,7 @@ def display():
     global CapturedFrames
     while True:
         lock.acquire()
-        Collage = makeCollage(CapturedFrames, MaxWidth=1000, FPSList=FPS)
+        Collage = makeCollage([CapturedFrame], MaxWidth=1000, FPSList=[FPS])
         # Collage = DummyFrame
         lock.release()
         cv2.imshow('Live Capture', Collage)
@@ -71,39 +71,31 @@ if __name__ == '__main__':
     nCams = len(dev_list)
     assert nCams > 0
     CamIdx = list(range(nCams))
-    print('Found {} cameras with indices: {}.'.format(nCams, CamIdx))
-    if Args.id != []:
-        CamIdx = Args.id
-    print('Limiting to camera indices: {}'.format(CamIdx))
-    nCams = len(CamIdx)
-    Cams = []
-    for i in CamIdx:
-        Cams.append(uvc.Capture(dev_list[i]["uid"]))
-        controls_dict = dict([(c.display_name, c) for c in Cams[-1].controls])
-        print('Camera in Bus:ID -', dev_list[i]['uid'], 'supports the following modes:', Cams[-1].avaible_modes)
-        for Key in dev_list[i].keys():
-            print(Key + ':', dev_list[i][Key])
-        Cams[-1].frame_mode = Cams[-1].available_modes[0]
-        print('Original camera bandwidth factor:', Cams[-1].bandwidth_factor)
-        Cams[-1].bandwidth_factor = 0.5
-        print('New camera bandwidth factor:', Cams[-1].bandwidth_factor)
+    assert Args.id in CamIdx
+    print('Found {} cameras with indices: {}. Using index {}'.format(nCams, CamIdx, Args.id))
+    nCams = 1
+    Cam = uvc.Capture(dev_list[Args.id]["uid"])
+    controls_dict = dict([(c.display_name, c) for c in Cam.controls])
+    print('Camera in Bus:ID -', dev_list[Args.id]['uid'], 'supports the following modes:', Cam.available_modes)
+    for Key in dev_list[Args.id].keys():
+        print(Key + ':', dev_list[Args.id][Key])
+    Cam.frame_mode = Cam.available_modes[0]
+    print('Original camera bandwidth factor:', Cam.bandwidth_factor)
+    Cam.bandwidth_factor = 0.5
+    print('New camera bandwidth factor:', Cam.bandwidth_factor)
 
-    DummyFrame = np.zeros((Cams[0].frame_mode[1], Cams[0].frame_mode[0], 3))
-    CapturedFrames = [DummyFrame]*nCams
+    CapturedFrame = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
     Stop = False
-    FPS = [0]*nCams
+    FPS = 0
     WindowSize = 200
-    FPSMovingAvg = [StreamingMovingAverage(window_size=WindowSize)]*nCams
+    FPSMovingAvg = StreamingMovingAverage(window_size=WindowSize)
     lock = threading.Lock()
     Threads = []
+
     DispThread = threading.Thread(target=display)
-    for i in range(nCams):
-        Threads.append(threading.Thread(target=grab_frame, args=(i,)))
+    CaptureThread = threading.Thread(target=grab_frame)
 
     DispThread.start()
-    for i in range(nCams):
-        Threads[i].start()
-
+    CaptureThread.start()
     DispThread.join()
-    for i in range(nCams):
-        Threads[i].join()
+    CaptureThread.join()
