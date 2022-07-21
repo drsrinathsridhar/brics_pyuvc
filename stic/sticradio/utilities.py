@@ -18,8 +18,8 @@ def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
     Shape = ImageList[0].shape
     for Ctr, Image in enumerate(ImageList, 0):
         if len(FPSList) == len(ImageList):
-            cv2.putText(img=Image, text=str(math.floor(FPSList[Ctr])), org=(Image.shape[1]-math.floor(Image.shape[1]/20), math.floor(Image.shape[1]/25)),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(0, 0, 255), thickness=2)
+            cv2.putText(img=Image, text=str(math.floor(FPSList[Ctr])), org=(Image.shape[1]-math.floor(Image.shape[1]/15), math.floor(Image.shape[1]/25)),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=Image.shape[1]/1000.0, color=(0, 0, 255), thickness=2)
         if Shape[0] != Image.shape[0] or Shape[1] != Image.shape[1]:
             Image = cv2.resize(Image, Shape)
 

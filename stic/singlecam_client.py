@@ -19,18 +19,20 @@ Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', type=str
 Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8080')
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
 
+Cam = None
 class SingleCamClient(sr.STICRadioClient):
-    Cam = None
     def __init__(self, Args):
         self.Args = Args
         super().__init__(Args.hostname, Args.port)
         self.init()
 
     def init(self):
+        global Cam
         self.Lock = threading.Lock()
         self.FPS = 0
         self.Latency = 0
         self.Stop = False
+        self.Cam = None
         self.WindowSize = 200
         self.FPSMovingAvg = StreamingMovingAverage(window_size=self.WindowSize)
 
@@ -41,26 +43,27 @@ class SingleCamClient(sr.STICRadioClient):
         self.CamIdx = list(range(self.nCams))
         assert self.Args.id in self.CamIdx
         print('Found {} cameras with indices: {}. Using camera with index {}.'.format(self.nCams, self.CamIdx, self.Args.id))
-        # Cam = uvc.Capture(self.dev_list[self.Args.id]['uid'])
-        self.Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
-        # controls_dict = dict([(c.display_name, c) for c in self.Cam.controls])
-        print('Camera in Bus:ID -', self.DeviceList[self.Args.id]['uid'], 'supports the following modes:', self.Cam.available_modes)
+        Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
+        # self.Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
+        # controls_dict = dict([(c.display_name, c) for c in Cam.controls])
+        print('Camera in Bus:ID -', self.DeviceList[self.Args.id]['uid'], 'supports the following modes:', Cam.available_modes)
         for Key in self.DeviceList[self.Args.id].keys():
             print(Key + ':', self.DeviceList[self.Args.id][Key])
-        self.Cam.frame_mode = self.Cam.available_modes[1]
-        print('Original camera bandwidth factor:', self.Cam.bandwidth_factor)
-        self.Cam.bandwidth_factor = 0.5
-        print('New camera bandwidth factor:', self.Cam.bandwidth_factor)
+        Cam.frame_mode = Cam.available_modes[1]
+        print('Original camera bandwidth factor:', Cam.bandwidth_factor)
+        Cam.bandwidth_factor = 0.5
+        print('New camera bandwidth factor:', Cam.bandwidth_factor)
 
-        self.ImagePayload = np.zeros((self.Cam.frame_mode[1], self.Cam.frame_mode[0], 3))
+        self.ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
 
     async def event_loop(self):
+        global Cam
         async with websockets.connect(self.URI) as websocket:
             print('[ INFO ]: Successfully connected to websocket server at', self.URI)
 
             while True:
                 startTime = getCurrentEpochTime()
-                Frame = self.Cam.get_frame_robust()
+                Frame = Cam.get_frame_robust()
                 ImageBytes = Frame.tobytes()
                 SendData = struct.pack('Qs', startTime, ImageBytes)
                 # print('Sending data at:', startTime)
