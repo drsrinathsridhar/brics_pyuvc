@@ -14,12 +14,13 @@ import struct
 import asyncio
 import websockets
 
-Parser = argparse.ArgumentParser(description='Example script to connect to a websocket ping/pong server.')
+Parser = argparse.ArgumentParser(description='Example singlecam client.')
 Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', type=str, default='localhost')
-Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8875')
+Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8080')
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
 
 class SingleCamClient(sr.STICRadioClient):
+    Cam = None
     def __init__(self, Args):
         self.Args = Args
         super().__init__(Args.hostname, Args.port)
@@ -30,22 +31,23 @@ class SingleCamClient(sr.STICRadioClient):
         self.FPS = 0
         self.Latency = 0
         self.Stop = False
-        WindowSize = 200
-        self.FPSMovingAvg = StreamingMovingAverage(window_size=WindowSize)
+        self.WindowSize = 200
+        self.FPSMovingAvg = StreamingMovingAverage(window_size=self.WindowSize)
 
-        dev_list = uvc.device_list()
+        self.DeviceList = uvc.device_list()
         # random.shuffle(dev_list)
-        self.nCams = len(dev_list)
+        self.nCams = len(self.DeviceList)
         assert self.nCams > 0
-        CamIdx = list(range(self.nCams))
-        assert self.Args.id in CamIdx
-        print('Found {} cameras with indices: {}. Using camera with index {}.'.format(self.nCams, CamIdx, self.Args.id))
-        self.Cam = uvc.Capture(dev_list[self.Args.id]['uid'])
-        # controls_dict = dict([(c.display_name, c) for c in Cam.controls])
-        print('Camera in Bus:ID -', dev_list[self.Args.id]['uid'], 'supports the following modes:', self.Cam.available_modes)
-        for Key in dev_list[self.Args.id].keys():
-            print(Key + ':', dev_list[self.Args.id][Key])
-        self.Cam.frame_mode = self.Cam.available_modes[0]
+        self.CamIdx = list(range(self.nCams))
+        assert self.Args.id in self.CamIdx
+        print('Found {} cameras with indices: {}. Using camera with index {}.'.format(self.nCams, self.CamIdx, self.Args.id))
+        # Cam = uvc.Capture(self.dev_list[self.Args.id]['uid'])
+        self.Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
+        # controls_dict = dict([(c.display_name, c) for c in self.Cam.controls])
+        print('Camera in Bus:ID -', self.DeviceList[self.Args.id]['uid'], 'supports the following modes:', self.Cam.available_modes)
+        for Key in self.DeviceList[self.Args.id].keys():
+            print(Key + ':', self.DeviceList[self.Args.id][Key])
+        self.Cam.frame_mode = self.Cam.available_modes[1]
         print('Original camera bandwidth factor:', self.Cam.bandwidth_factor)
         self.Cam.bandwidth_factor = 0.5
         print('New camera bandwidth factor:', self.Cam.bandwidth_factor)

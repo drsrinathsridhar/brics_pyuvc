@@ -38,7 +38,6 @@ class STICRadioClient():
         self.Hostname = hostname
         self.Port = port
         self.URI = 'ws://' + self.Hostname + ':' + self.Port
-        self.Websocket = None
         self.init()
 
     def init(self):
