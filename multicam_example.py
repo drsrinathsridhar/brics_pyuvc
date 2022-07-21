@@ -55,18 +55,18 @@ def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
         if Shape[0] != Image.shape[0] or Shape[1] != Image.shape[1]:
             Image = cv2.resize(Image, Shape)
 
-    if nImages == 1:
-        return ImageList[0]
+    if nImages > 1:
+        nCols = math.ceil(math.sqrt(nImages))
+        nRows = math.ceil(nImages / nCols)
+        # print('nImages, Cols, Rows:', nImages, ',' ,nCols, ',', nRows)
 
-    nCols = math.ceil(math.sqrt(nImages))
-    nRows = math.ceil(nImages / nCols)
-    # print('nImages, Cols, Rows:', nImages, ',' ,nCols, ',', nRows)
-
-    Collage = np.zeros((Shape[0]*nRows, Shape[1]*nCols, Shape[2]), np.uint8)
-    for i in range(0, nImages):
-        Row = math.floor(i / nCols)
-        Col = i % nCols
-        Collage[Row*Shape[0]:Row*Shape[0]+Shape[0], Col*Shape[1]:Col*Shape[1]+Shape[1], :] = ImageList[i].copy()
+        Collage = np.zeros((Shape[0]*nRows, Shape[1]*nCols, Shape[2]), np.uint8)
+        for i in range(0, nImages):
+            Row = math.floor(i / nCols)
+            Col = i % nCols
+            Collage[Row*Shape[0]:Row*Shape[0]+Shape[0], Col*Shape[1]:Col*Shape[1]+Shape[1], :] = ImageList[i].copy()
+    else:
+        Collage = ImageList[0]
 
     if Collage.shape[1] > MaxWidth:
         Fact = Collage.shape[1] / MaxWidth
@@ -146,7 +146,7 @@ if __name__ == '__main__':
         global CapturedFrames
         while True:
             lock.acquire()
-            Collage = makeCollage(CapturedFrames, MaxWidth=1600, FPSList=FPS)
+            Collage = makeCollage(CapturedFrames, MaxWidth=1000, FPSList=FPS)
             # Collage = DummyFrame
             lock.release()
             cv2.imshow('Live Capture', Collage)
