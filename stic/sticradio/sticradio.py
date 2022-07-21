@@ -25,7 +25,7 @@ class STICRadioServer():
             await websocket.send(str(EpochTime)) # Send only the epoch time back
 
     async def main(self):
-        async with websockets.serve(self.event_loop, port=self.Port):
+        async with websockets.serve(self.event_loop, port=self.Port, max_size=2**32):
             print('[ INFO ]: Successfully created websocket server in port', self.Port)
             await asyncio.Future()  # run forever
 
@@ -46,7 +46,7 @@ class STICRadioClient():
         self.TestData = np.random.uniform(low=0.0, high= 255.0, size=(1920, 1080, 3)).astype(np.uint8)  # Simulating a full HD image
 
     async def event_loop(self):
-        async with websockets.connect(self.URI) as websocket:
+        async with websockets.connect(self.URI, max_size=2**32) as websocket:
             print('[ INFO ]: Successfully connected to websocket server at', self.URI)
             while True:
                 time.sleep(1/260.0)

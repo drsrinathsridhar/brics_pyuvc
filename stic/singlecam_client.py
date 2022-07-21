@@ -20,6 +20,30 @@ Parser.add_argument('-p', '--port', help='Port number on host.', type=str, defau
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
 
 Cam = None
+def init_camera(Args):
+    global Cam
+    DeviceList = uvc.device_list()
+    # random.shuffle(dev_list)
+    nCams = len(DeviceList)
+    assert nCams > 0
+    CamIdx = list(range(nCams))
+    assert Args.id in CamIdx
+    print('Found {} cameras with indices: {}. Using camera with index {}.'.format(nCams, CamIdx, Args.id))
+    Cam = uvc.Capture(DeviceList[Args.id]['uid'])
+    # self.Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
+    # controls_dict = dict([(c.display_name, c) for c in Cam.controls])
+    print('Camera in Bus:ID -', DeviceList[Args.id]['uid'], 'supports the following modes:',
+          Cam.available_modes)
+    for Key in DeviceList[Args.id].keys():
+        print(Key + ':', DeviceList[Args.id][Key])
+    Cam.frame_mode = Cam.available_modes[1]
+    print('Original camera bandwidth factor:', Cam.bandwidth_factor)
+    Cam.bandwidth_factor = 0.5
+    print('New camera bandwidth factor:', Cam.bandwidth_factor)
+    ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
+
+    return DeviceList, nCams, CamIdx, ImagePayload
+
 class SingleCamClient(sr.STICRadioClient):
     def __init__(self, Args):
         self.Args = Args
@@ -36,25 +60,27 @@ class SingleCamClient(sr.STICRadioClient):
         self.WindowSize = 200
         self.FPSMovingAvg = StreamingMovingAverage(window_size=self.WindowSize)
 
-        self.DeviceList = uvc.device_list()
-        # random.shuffle(dev_list)
-        self.nCams = len(self.DeviceList)
-        assert self.nCams > 0
-        self.CamIdx = list(range(self.nCams))
-        assert self.Args.id in self.CamIdx
-        print('Found {} cameras with indices: {}. Using camera with index {}.'.format(self.nCams, self.CamIdx, self.Args.id))
-        Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
-        # self.Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
-        # controls_dict = dict([(c.display_name, c) for c in Cam.controls])
-        print('Camera in Bus:ID -', self.DeviceList[self.Args.id]['uid'], 'supports the following modes:', Cam.available_modes)
-        for Key in self.DeviceList[self.Args.id].keys():
-            print(Key + ':', self.DeviceList[self.Args.id][Key])
-        Cam.frame_mode = Cam.available_modes[1]
-        print('Original camera bandwidth factor:', Cam.bandwidth_factor)
-        Cam.bandwidth_factor = 0.5
-        print('New camera bandwidth factor:', Cam.bandwidth_factor)
+        # (self.DeviceList, self.nCams, self.CamIdx, self.ImagePayload) = init_camera(Args)
 
-        self.ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
+        # self.DeviceList = uvc.device_list()
+        # # random.shuffle(dev_list)
+        # self.nCams = len(self.DeviceList)
+        # assert self.nCams > 0
+        # self.CamIdx = list(range(self.nCams))
+        # assert self.Args.id in self.CamIdx
+        # print('Found {} cameras with indices: {}. Using camera with index {}.'.format(self.nCams, self.CamIdx, self.Args.id))
+        # Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
+        # # self.Cam = uvc.Capture(self.DeviceList[self.Args.id]['uid'])
+        # # controls_dict = dict([(c.display_name, c) for c in Cam.controls])
+        # print('Camera in Bus:ID -', self.DeviceList[self.Args.id]['uid'], 'supports the following modes:', Cam.available_modes)
+        # for Key in self.DeviceList[self.Args.id].keys():
+        #     print(Key + ':', self.DeviceList[self.Args.id][Key])
+        # Cam.frame_mode = Cam.available_modes[1]
+        # print('Original camera bandwidth factor:', Cam.bandwidth_factor)
+        # Cam.bandwidth_factor = 0.5
+        # print('New camera bandwidth factor:', Cam.bandwidth_factor)
+
+        # self.ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
 
     async def event_loop(self):
         global Cam
@@ -64,14 +90,15 @@ class SingleCamClient(sr.STICRadioClient):
             while True:
                 startTime = getCurrentEpochTime()
                 Frame = Cam.get_frame_robust()
-                ImageBytes = Frame.tobytes()
-                SendData = struct.pack('Qs', startTime, ImageBytes)
-                # print('Sending data at:', startTime)
+                ImageBytes = np.ascontiguousarray(Frame.img, dtype='>i1').tobytes() # Big-endian 1-byte integer == uint8
+                # print(len(ImageBytes))
+                # SendData = struct.pack('<Qs', startTime, ImageBytes)
+                SendData = startTime.to_bytes(24, byteorder='big')+ImageBytes # 24 is int max size
+                # SendData = startTime.to_bytes(24, byteorder='big') # 24 is int max size
                 await websocket.send(SendData)
                 ReceivedData = await websocket.recv()
-                # print('Received Data:', ReceivedData)
                 self.Latency = (getCurrentEpochTime() - int(ReceivedData))/2000
-                print('Latency: {} milliseconds'.format(self.Latency))
+                print('Latency: {} ms'.format(self.Latency))
 
                 self.Lock.acquire()
                 self.ImagePayload = np.copy(Frame.img)
@@ -100,4 +127,5 @@ if __name__ == '__main__':
     Args = Parser.parse_args()
 
     CamServer = SingleCamClient(Args)
+    (CamServer.DeviceList, CamServer.nCams, CamServer.CamIdx, CamServer.ImagePayload) = init_camera(Args)
     CamServer.start()

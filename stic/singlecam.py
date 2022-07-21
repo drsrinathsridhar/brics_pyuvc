@@ -81,7 +81,7 @@ if __name__ == '__main__':
         print(Key + ':', dev_list[Args.id][Key])
     Cam.frame_mode = Cam.available_modes[0]
     print('Original camera bandwidth factor:', Cam.bandwidth_factor)
-    Cam.bandwidth_factor = 1.2
+    Cam.bandwidth_factor = 2
     print('New camera bandwidth factor:', Cam.bandwidth_factor)
 
     CapturedFrame = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
