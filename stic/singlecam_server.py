@@ -26,17 +26,24 @@ class SingleCamServer(sr.STICRadioServer):
         self.UVCFrame = uvc.Frame()
 
         self.ImagePayload = np.zeros(self.Imagesize)
+        self.ImageBuffer = None
         self.Lock = threading.Lock()
         self.Stop = False
         self.FPS = 0
         WindowSize = 200
+        self.TicToc = [0]*2
         self.FPSMovingAvg = StreamingMovingAverage(window_size=WindowSize)
         self.DispThread = threading.Thread(target=self.display)
 
     def display(self):
         print('Starting display thread...')
         while True:
-            self.ImagePayload = self.UVCFrame.img
+            if self.ImageBuffer is None:
+                self.ImagePayload = np.zeros(self.Imagesize)
+            else:
+                ImageArray = np.array(bytearray(self.ImageBuffer), dtype=np.uint8)
+                self.ImagePayload = cv2.imdecode(ImageArray, -1)
+
             if len(self.ImagePayload.shape) < 3:
                 continue
             self.Lock.acquire()
@@ -52,14 +59,22 @@ class SingleCamServer(sr.STICRadioServer):
                 break
 
     async def event_loop(self, websocket, path):
-        # self.DispThread.start()
+        self.DispThread.start()
         async for Data in websocket:
-            EpochTime = int.from_bytes(Data[:24], 'big')
-            ImagePayload = Data[24:]
+            FrameCaptureTime = int.from_bytes(Data[:24], 'big')
+            self.ImageBuffer = Data[24:]
+
             # self.UVCFrame.jpeg_buffer = Data[24:]
             # print('Data received from websocket:', EpochTime)
             # self.ImagePayload = np.frombuffer(ImagePayload, dtype=np.uint8).reshape(self.ImageSize)
-            await websocket.send(str(EpochTime)) # Send only the epoch time back
+            await websocket.send(str(FrameCaptureTime)) # Send only the epoch time back
+            self.TicToc[0] = self.TicToc[1]
+            self.TicToc[1] = getCurrentEpochTime()
+            ElapsedTime = (self.TicToc[1] - self.TicToc[0])
+            self.Lock.acquire()
+            CurrentFPS = 1e6 / (ElapsedTime)
+            self.FPS = self.FPSMovingAvg + CurrentFPS
+            self.Lock.release()
 
 # class SingleCamClient(sr.STICRadioClient):
 #     def init(self):

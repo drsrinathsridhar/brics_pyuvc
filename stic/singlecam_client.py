@@ -38,7 +38,7 @@ def init_camera(Args):
         print(Key + ':', DeviceList[Args.id][Key])
     Cam.frame_mode = Cam.available_modes[1]
     print('Original camera bandwidth factor:', Cam.bandwidth_factor)
-    Cam.bandwidth_factor = 0.8
+    Cam.bandwidth_factor = 1.0
     print('New camera bandwidth factor:', Cam.bandwidth_factor)
     ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
 
@@ -115,7 +115,7 @@ class SingleCamClient(sr.STICRadioClient):
                 CurrentFPS = 1e6 / (ElapsedTime)
                 self.FPS = self.FPSMovingAvg + CurrentFPS
                 self.Lock.release()
-                print('FPS:', self.FPS)
+                # print('FPS:', self.FPS)
 
                 if self.Stop:
                     break
