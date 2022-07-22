@@ -22,8 +22,8 @@ class SingleCamServer(sr.STICRadioServer):
         self.init()
 
     def init(self):
-        # self.Imagesize = (720, 1280, 3)
-        self.Imagesize = (360, 640, 3)
+        self.Imagesize = (720, 1280, 3)
+        # self.Imagesize = (360, 640, 3)
         self.UVCFrame = uvc.Frame()
 
         self.ImagePayload = np.zeros(self.Imagesize)
