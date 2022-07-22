@@ -38,7 +38,7 @@ def init_camera(Args):
         print(Key + ':', DeviceList[Args.id][Key])
     Cam.frame_mode = Cam.available_modes[1]
     print('Original camera bandwidth factor:', Cam.bandwidth_factor)
-    Cam.bandwidth_factor = 0.5
+    Cam.bandwidth_factor = 0.8
     print('New camera bandwidth factor:', Cam.bandwidth_factor)
     ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
 
@@ -89,15 +89,16 @@ class SingleCamClient(sr.STICRadioClient):
 
             while True:
                 startTime = getCurrentEpochTime()
+                tic = getCurrentEpochTime()
                 Frame = Cam.get_frame_robust()
-                ImageBytes = np.ascontiguousarray(Frame.img, dtype='>i1').tobytes() # Big-endian 1-byte integer == uint8
-                # print(len(ImageBytes))
-                # SendData = struct.pack('<Qs', startTime, ImageBytes)
-                SendData = startTime.to_bytes(24, byteorder='big')+ImageBytes # 24 is int max size
-                # SendData = startTime.to_bytes(24, byteorder='big') # 24 is int max size
+                # ImageBytes = np.ascontiguousarray(Frame.img, dtype='>i1').tobytes() # Big-endian 1-byte integer == uint8
+                ImageBytes = Frame.jpeg_buffer
+                toc = getCurrentEpochTime()
+                # print('Get frame time (ms):', (toc-tic) / 1000)
+                SendData = startTime.to_bytes(24, byteorder='big') + ImageBytes # 24 is int max size
                 await websocket.send(SendData)
-                ReceivedData = await websocket.recv()
-                self.Latency = (getCurrentEpochTime() - int(ReceivedData))/2000
+                ReceivedEpochTime = await websocket.recv()
+                self.Latency = (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
                 print('Latency: {} ms'.format(self.Latency))
 
                 self.Lock.acquire()
@@ -114,7 +115,7 @@ class SingleCamClient(sr.STICRadioClient):
                 CurrentFPS = 1e6 / (ElapsedTime)
                 self.FPS = self.FPSMovingAvg + CurrentFPS
                 self.Lock.release()
-                # print('FPS:', num, math.floor(FPS[num]), flush=True)
+                print('FPS:', self.FPS)
 
                 if self.Stop:
                     break

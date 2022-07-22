@@ -22,7 +22,10 @@ class SingleCamServer(sr.STICRadioServer):
         self.init()
 
     def init(self):
-        self.ImagePayload = np.zeros((720, 1280, 3))
+        self.Imagesize = (720, 1280, 3)
+        self.UVCFrame = uvc.Frame()
+
+        self.ImagePayload = np.zeros(self.Imagesize)
         self.Lock = threading.Lock()
         self.Stop = False
         self.FPS = 0
@@ -33,6 +36,7 @@ class SingleCamServer(sr.STICRadioServer):
     def display(self):
         print('Starting display thread...')
         while True:
+            self.ImagePayload = self.UVCFrame.img
             if len(self.ImagePayload.shape) < 3:
                 continue
             self.Lock.acquire()
@@ -48,13 +52,13 @@ class SingleCamServer(sr.STICRadioServer):
                 break
 
     async def event_loop(self, websocket, path):
-        self.DispThread.start()
+        # self.DispThread.start()
         async for Data in websocket:
             EpochTime = int.from_bytes(Data[:24], 'big')
             ImagePayload = Data[24:]
+            # self.UVCFrame.jpeg_buffer = Data[24:]
             # print('Data received from websocket:', EpochTime)
-            self.ImagePayload = np.frombuffer(ImagePayload, dtype=np.uint8).reshape((720, 1280, 3))
-            # assert len(self.ImagePayload.shape) >= 3
+            # self.ImagePayload = np.frombuffer(ImagePayload, dtype=np.uint8).reshape(self.ImageSize)
             await websocket.send(str(EpochTime)) # Send only the epoch time back
 
 # class SingleCamClient(sr.STICRadioClient):
