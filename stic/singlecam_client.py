@@ -36,7 +36,7 @@ def init_camera(Args):
           Cam.available_modes)
     for Key in DeviceList[Args.id].keys():
         print(Key + ':', DeviceList[Args.id][Key])
-    Cam.frame_mode = Cam.available_modes[1]
+    Cam.frame_mode = Cam.available_modes[0]
     print('Original camera bandwidth factor:', Cam.bandwidth_factor)
     Cam.bandwidth_factor = 1.0
     print('New camera bandwidth factor:', Cam.bandwidth_factor)
