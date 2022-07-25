@@ -18,6 +18,8 @@ Parser = argparse.ArgumentParser(description='Example singlecam client.')
 Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', type=str, default='localhost')
 Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8080')
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
+Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', choices=[0, 1, 2], type=int, required=False, default=0)
+Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', type=float, required=False, default=2.0)
 
 Cam = None
 def init_camera(Args):
@@ -36,9 +38,9 @@ def init_camera(Args):
           Cam.available_modes)
     for Key in DeviceList[Args.id].keys():
         print(Key + ':', DeviceList[Args.id][Key])
-    Cam.frame_mode = Cam.available_modes[1]
+    Cam.frame_mode = Cam.available_modes[Args.format_id]
     print('Original camera bandwidth factor:', Cam.bandwidth_factor)
-    Cam.bandwidth_factor = 1
+    Cam.bandwidth_factor = Args.bandwidth_factor
     print('New camera bandwidth factor:', Cam.bandwidth_factor)
     ImagePayload = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
 

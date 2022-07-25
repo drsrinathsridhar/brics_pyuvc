@@ -12,6 +12,8 @@ from sticradio.utilities import getCurrentEpochTime, makeCollage, StreamingMovin
 
 Parser = argparse.ArgumentParser(description='Sample script to stream from a single UVC camera.')
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
+Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', choices=[0, 1, 2], type=int, required=False, default=0)
+Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', type=float, required=False, default=2.0)
 
 def grab_frame():
     global Stop
@@ -79,9 +81,9 @@ if __name__ == '__main__':
     print('Camera in Bus:ID -', dev_list[Args.id]['uid'], 'supports the following modes:', Cam.available_modes)
     for Key in dev_list[Args.id].keys():
         print(Key + ':', dev_list[Args.id][Key])
-    Cam.frame_mode = Cam.available_modes[0]
+    Cam.frame_mode = Cam.available_modes[Args.format_id]
     print('Original camera bandwidth factor:', Cam.bandwidth_factor)
-    Cam.bandwidth_factor = 2
+    Cam.bandwidth_factor = Args.bandwidth_factor
     print('New camera bandwidth factor:', Cam.bandwidth_factor)
 
     CapturedFrame = np.zeros((Cam.frame_mode[1], Cam.frame_mode[0], 3))
