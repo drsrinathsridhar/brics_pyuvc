@@ -41,7 +41,7 @@ def grab_frame():
         CurrentFPS = 1e6 / (ElapsedTime)
         FPS = FPSMovingAvg + CurrentFPS
         lock.release()
-        print('FPS:', math.floor(FPS), flush=True, end=' ')
+        print('FPS:', math.floor(FPS), flush=True, end='\r')
 
         if Stop:
             break
