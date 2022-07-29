@@ -5,6 +5,7 @@ import time
 import argparse
 import sys
 import os
+import math
 FileDirPath = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(FileDirPath, '..'))
 import uvc
@@ -14,6 +15,7 @@ Parser = argparse.ArgumentParser(description='Sample script to stream from a sin
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
 Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', choices=[0, 1, 2], type=int, required=False, default=0)
 Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', type=float, required=False, default=2.0)
+Parser.add_argument('--no-viz', action='store_true')
 
 def grab_frame():
     global Stop
@@ -39,7 +41,7 @@ def grab_frame():
         CurrentFPS = 1e6 / (ElapsedTime)
         FPS = FPSMovingAvg + CurrentFPS
         lock.release()
-        # print('FPS:', num, math.floor(FPS[num]), flush=True)
+        print('FPS:', math.floor(FPS), flush=True, end=' ')
 
         if Stop:
             break
@@ -94,10 +96,13 @@ if __name__ == '__main__':
     lock = threading.Lock()
     Threads = []
 
-    DispThread = threading.Thread(target=display)
+    if Args.no_viz == False:
+        DispThread = threading.Thread(target=display)
     CaptureThread = threading.Thread(target=grab_frame)
 
-    DispThread.start()
+    if Args.no_viz == False:
+        DispThread.start()
     CaptureThread.start()
-    DispThread.join()
+    if Args.no_viz == False:
+        DispThread.join()
     CaptureThread.join()
