@@ -27,11 +27,9 @@ def grab_frame():
     while True:
         startTime = getCurrentEpochTime()
         Frame = Cam.get_frame_robust()
-        # lock.acquire()
-        # CapturedFrame = np.copy(Frame.img)
-        # lock.release()
-        # CapturedFrames[num] = Cams[num].get_frame()
-        # print("Cam: {} shape: {}".format(num, CapturedFrames[num].img.shape))
+        lock.acquire()
+        CapturedFrame = Frame.jpeg_buffer.copy()
+        lock.release()
         endTime = getCurrentEpochTime()
         ElapsedTime = (endTime - startTime)
         if ElapsedTime < 1000:
@@ -53,7 +51,8 @@ def display():
     global CapturedFrames
     while True:
         lock.acquire()
-        Collage = makeCollage([CapturedFrame], MaxWidth=1000, FPSList=[FPS])
+        CapturedFrameDecoded = np.array(bytearray(CapturedFrame), dtype=np.uint8)
+        Collage = makeCollage([CapturedFrameDecoded], MaxWidth=1000, FPSList=[FPS])
         # Collage = DummyFrame
         lock.release()
         cv2.imshow('Live Capture', Collage)
