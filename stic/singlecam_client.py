@@ -97,7 +97,7 @@ class SingleCamClient(sr.STICRadioClient):
                 ImageBytes = Frame.jpeg_buffer
                 toc = getCurrentEpochTime()
                 # print('Get frame time (ms):', (toc-tic) / 1000)
-                SendData = startTime.timestamp.to_bytes(24, byteorder='big') + ImageBytes # 24 is int max size
+                SendData = startTime.to_bytes(24, byteorder='big') + ImageBytes # 24 is int max size
                 await websocket.send(SendData)
                 ReceivedEpochTime = await websocket.recv()
                 self.Latency = (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
