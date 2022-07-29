@@ -51,10 +51,10 @@ def display():
     global CapturedFrames
     while True:
         lock.acquire()
-        CapturedFrameDecoded = np.array(bytearray(CapturedFrame), dtype=np.uint8)
+        CapturedFrameDecoded = cv2.imdecode(np.array(bytearray(CapturedFrame), dtype=np.uint8), -1)
+        lock.release()
         Collage = makeCollage([CapturedFrameDecoded], MaxWidth=1000, FPSList=[FPS])
         # Collage = DummyFrame
-        lock.release()
         cv2.imshow('Live Capture', Collage)
         Key = cv2.waitKey(1)
         if Key == 27:
