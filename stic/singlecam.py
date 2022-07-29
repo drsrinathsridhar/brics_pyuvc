@@ -27,9 +27,9 @@ def grab_frame():
     while True:
         startTime = getCurrentEpochTime()
         Frame = Cam.get_frame_robust()
-        lock.acquire()
-        CapturedFrame = np.copy(Frame.img)
-        lock.release()
+        # lock.acquire()
+        # CapturedFrame = np.copy(Frame.img)
+        # lock.release()
         # CapturedFrames[num] = Cams[num].get_frame()
         # print("Cam: {} shape: {}".format(num, CapturedFrames[num].img.shape))
         endTime = getCurrentEpochTime()
