@@ -53,6 +53,8 @@ def display():
         lock.acquire()
         CapturedFrameDecoded = cv2.imdecode(np.array(bytearray(CapturedFrame), dtype=np.uint8), -1)
         lock.release()
+        if CapturedFrameDecoded is None:
+            continue
         if len(CapturedFrameDecoded) < 3:
             continue
 
