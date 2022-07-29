@@ -53,6 +53,9 @@ def display():
         lock.acquire()
         CapturedFrameDecoded = cv2.imdecode(np.array(bytearray(CapturedFrame), dtype=np.uint8), -1)
         lock.release()
+        if len(CapturedFrameDecoded) < 3:
+            continue
+
         Collage = makeCollage([CapturedFrameDecoded], MaxWidth=1000, FPSList=[FPS])
         # Collage = DummyFrame
         cv2.imshow('Live Capture', Collage)
