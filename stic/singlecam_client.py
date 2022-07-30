@@ -98,6 +98,7 @@ class SingleCamClient(sr.STICRadioClient):
                 await websocket.send(SendData)
                 ReceivedEpochTime = await websocket.recv()
                 self.Latency = self.LatencyMovingAvg + (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
+                # self.Latency = (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
                 toc = getCurrentEpochTime()
 
                 ElapsedTime = (toc - tic)

@@ -43,24 +43,19 @@ class SingleCamServer(sr.STICRadioServer):
 
             if len(self.ImagePayload.shape) < 3:
                 continue
-            self.Lock.acquire()
             Collage = makeCollage([self.ImagePayload], MaxWidth=1000, FPSList=[self.FPS])
-            self.Lock.release()
             cv2.imshow('Single Cam Server', Collage)
             Key = cv2.waitKey(1)
             if Key == 27:
-                self.Lock.acquire()
+                print('Stopping display...')
                 self.Stop = True
-                asyncio.get_event_loop().stop()
-                self.Lock.release()
                 break
 
     async def event_loop(self, websocket, path):
-        print(websocket)
         self.DispThread.start()
         async for Data in websocket:
             self.FrameCaptureTime = int.from_bytes(Data[:24], 'big')
-            self.ImageBuffer = Data[24:]
+            self.JPEGBuffer = Data[24:]
 
             await websocket.send(str(self.FrameCaptureTime)) # Send only the epoch time back for latency calculation
             self.TicToc[0] = self.TicToc[1]
