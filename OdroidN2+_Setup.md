@@ -15,3 +15,8 @@ On Odroid Ubuntu MATE, the udev rules are a bit different:
 Update is also different
 
 `sudo udevadm control --reload-rules && udevadm trigger`
+
+
+Create a disk image from a working SD card:
+
+`sudo dd bs=4M if=/dev/sda of=~/2020-07-30_Odroid.img status=progress`
