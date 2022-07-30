@@ -10,22 +10,21 @@ sys.path.append(os.path.join(FileDirPath, '..'))
 import uvc
 from sticradio.utilities import getCurrentEpochTime, makeCollage, StreamingMovingAverage
 from sticradio import sticradio as sr
-import struct
 import asyncio
 import websockets
 
 Parser = argparse.ArgumentParser(description='Example singlecam client.')
-Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', type=str, default='localhost')
-Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8080')
+Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', required=False, type=str, default='localhost')
+Parser.add_argument('-p', '--port', help='Port number on host.', required=False, type=str, default='8080')
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', required=False, type=int, default=0)
-Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', choices=[0, 1, 2], type=int, required=False, default=0)
-Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', type=float, required=False, default=2.0)
+Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', required=False, choices=[0, 1, 2], type=int, default=0)
+Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', required=False, type=float, default=2.0)
 
+# PyUVC has a problem that prevents a device from being created with a class object
 Cam = None
 def init_camera(Args):
     global Cam
     DeviceList = uvc.device_list()
-    # random.shuffle(dev_list)
     nCams = len(DeviceList)
     assert nCams > 0
     CamIdx = list(range(nCams))
@@ -102,7 +101,6 @@ class SingleCamClient(sr.STICRadioClient):
                 toc = getCurrentEpochTime()
 
                 ElapsedTime = (toc - tic)
-                # print('Get frame time (ms):', ElapsedTime / 1000, end='\r')
                 if ElapsedTime < 1000:
                     time.sleep(0.001)  # Prevent CPU throttling
                     ElapsedTime += 1000
@@ -115,9 +113,6 @@ class SingleCamClient(sr.STICRadioClient):
 
 
 if __name__ == '__main__':
-    # if len(sys.argv) == 1:
-    #     Parser.print_help()
-    #     exit()
     Args = Parser.parse_args()
 
     CamServer = SingleCamClient(Args)
