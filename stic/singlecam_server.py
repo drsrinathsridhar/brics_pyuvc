@@ -36,7 +36,7 @@ class SingleCamServer(sr.STICRadioServer):
         print('Starting display thread...')
         while True:
             if self.JPEGBuffer is None:
-                self.ImagePayload = np.zeros((100, 100, 3))
+                self.ImagePayload = np.zeros((720, 1280, 3))
             else:
                 ImageArray = np.array(bytearray(self.JPEGBuffer), dtype=np.uint8)
                 self.ImagePayload = cv2.imdecode(ImageArray, -1)
@@ -56,8 +56,8 @@ class SingleCamServer(sr.STICRadioServer):
         async for Data in websocket:
             self.FrameCaptureTime = int.from_bytes(Data[:24], 'big')
             self.JPEGBuffer = Data[24:]
-
             await websocket.send(str(self.FrameCaptureTime)) # Send only the epoch time back for latency calculation
+
             self.TicToc[0] = self.TicToc[1]
             self.TicToc[1] = getCurrentEpochTime()
             ElapsedTime = (self.TicToc[1] - self.TicToc[0])

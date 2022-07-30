@@ -19,6 +19,7 @@ Parser.add_argument('-p', '--port', help='Port number on host.', required=False,
 Parser.add_argument('-i', '--id', help='Which camera ID to use.', required=False, type=int, default=0)
 Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', required=False, choices=[0, 1, 2], type=int, default=0)
 Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', required=False, type=float, default=2.0)
+Parser.add_argument('-t', '--target-fps', help='What FPS should the websocket send at?', required=False, type=float, default=120)
 
 # PyUVC has a problem that prevents a device from being created with a class object
 Cam = None
@@ -101,10 +102,13 @@ class SingleCamClient(sr.STICRadioClient):
                 # self.Latency = (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
                 toc = getCurrentEpochTime()
 
-                ElapsedTime = (toc - tic)
-                if ElapsedTime < 1000:
-                    time.sleep(0.001)  # Prevent CPU throttling
-                    ElapsedTime += 1000
+                ElapsedTime = (toc - tic) # Micro seconds
+                TargetTime = (1.0 / self.Args.target_fps) * 1e6 # Micro seconds
+                if ElapsedTime < TargetTime: # milli seconds
+                    # print('Wait for {} us'.format((TargetTime - ElapsedTime)), '\r')
+                    time.sleep((TargetTime - ElapsedTime)*1e-6)  # Seconds
+                    toc = getCurrentEpochTime()
+                    ElapsedTime = (toc - tic)
                 CurrentFPS = 1e6 / (ElapsedTime)
                 self.FPS = self.FPSMovingAvg + CurrentFPS
                 print('Latency (ms): {}, FPS: {}'.format(str(round(self.Latency, 1)).rjust(2, ' '), str(round(self.FPS))).rjust(2, ' '), end='\r')
