@@ -56,11 +56,12 @@ class SingleCamClient(sr.STICRadioClient):
         global Cam
         self.Lock = threading.Lock()
         self.FPS = 0
-        self.Latency = 0
+        self.Latency = 0.0
         self.Stop = False
         self.Cam = None
         self.WindowSize = 200
         self.FPSMovingAvg = StreamingMovingAverage(window_size=self.WindowSize)
+        self.LatencyMovingAvg = StreamingMovingAverage(window_size=self.WindowSize)
 
         # (self.DeviceList, self.nCams, self.CamIdx, self.ImagePayload) = init_camera(Args)
 
@@ -100,24 +101,18 @@ class SingleCamClient(sr.STICRadioClient):
                 SendData = startTime.to_bytes(24, byteorder='big') + ImageBytes # 24 is int max size
                 await websocket.send(SendData)
                 ReceivedEpochTime = await websocket.recv()
-                self.Latency = (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
-                print('Latency: {} ms'.format(self.Latency))
+                self.Latency = self.LatencyMovingAvg + (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
 
-                # self.Lock.acquire()
-                # self.ImagePayload = np.copy(Frame.img)
-                # self.Lock.release()
-                # CapturedFrames[num] = Cams[num].get_frame()
-                # print("Cam: {} shape: {}".format(num, CapturedFrames[num].img.shape))
                 endTime = getCurrentEpochTime()
                 ElapsedTime = (endTime - startTime)
                 if ElapsedTime < 1000:
                     time.sleep(0.001)  # Prevent CPU throttling
                     ElapsedTime += 1000
-                self.Lock.acquire()
+                # self.Lock.acquire()
                 CurrentFPS = 1e6 / (ElapsedTime)
                 self.FPS = self.FPSMovingAvg + CurrentFPS
-                self.Lock.release()
-                # print('FPS:', self.FPS)
+                # self.Lock.release()
+                print('Latency (ms): {}, FPS: {}'.format(str(round(self.Latency, 1)).rjust(2, ' '), str(round(self.FPS))).rjust(2, ' '), end='\r')
 
                 if self.Stop:
                     break
