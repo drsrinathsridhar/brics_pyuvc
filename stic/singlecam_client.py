@@ -17,7 +17,7 @@ import websockets
 Parser = argparse.ArgumentParser(description='Example singlecam client.')
 Parser.add_argument('-o', '--hostname', help='Hostname or IP address.', type=str, default='localhost')
 Parser.add_argument('-p', '--port', help='Port number on host.', type=str, default='8080')
-Parser.add_argument('-i', '--id', help='Which camera ID to use.', type=int, required=False, default=0)
+Parser.add_argument('-i', '--id', help='Which camera ID to use.', required=False, type=int, default=0)
 Parser.add_argument('-f', '--format-id', help='Which format to use from 3 that ELP cameras support.', choices=[0, 1, 2], type=int, required=False, default=0)
 Parser.add_argument('-b', '--bandwidth-factor', help='What bandwidth factor to use?', type=float, required=False, default=2.0)
 
@@ -91,27 +91,23 @@ class SingleCamClient(sr.STICRadioClient):
             print('[ INFO ]: Successfully connected to websocket server at', self.URI)
 
             while True:
-                startTime = getCurrentEpochTime()
                 tic = getCurrentEpochTime()
                 Frame = Cam.get_frame_robust()
                 # ImageBytes = np.ascontiguousarray(Frame.img, dtype='>i1').tobytes() # Big-endian 1-byte integer == uint8
                 ImageBytes = Frame.jpeg_buffer
-                toc = getCurrentEpochTime()
-                # print('Get frame time (ms):', (toc-tic) / 1000)
-                SendData = startTime.to_bytes(24, byteorder='big') + ImageBytes # 24 is int max size
+                SendData = tic.to_bytes(24, byteorder='big') + ImageBytes # 24 is int max size
                 await websocket.send(SendData)
                 ReceivedEpochTime = await websocket.recv()
                 self.Latency = self.LatencyMovingAvg + (getCurrentEpochTime() - int(ReceivedEpochTime)) / 2000.0
+                toc = getCurrentEpochTime()
 
-                endTime = getCurrentEpochTime()
-                ElapsedTime = (endTime - startTime)
+                ElapsedTime = (toc - tic)
+                # print('Get frame time (ms):', ElapsedTime / 1000, end='\r')
                 if ElapsedTime < 1000:
                     time.sleep(0.001)  # Prevent CPU throttling
                     ElapsedTime += 1000
-                # self.Lock.acquire()
                 CurrentFPS = 1e6 / (ElapsedTime)
                 self.FPS = self.FPSMovingAvg + CurrentFPS
-                # self.Lock.release()
                 print('Latency (ms): {}, FPS: {}'.format(str(round(self.Latency, 1)).rjust(2, ' '), str(round(self.FPS))).rjust(2, ' '), end='\r')
 
                 if self.Stop:
