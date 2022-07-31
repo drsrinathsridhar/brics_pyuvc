@@ -20,3 +20,9 @@ Update is also different
 Create a disk image from a working SD card:
 
 `sudo dd bs=4M if=/dev/sda of=~/2020-07-30_Odroid.img status=progress`
+
+Modified Ubuntu STIC images are at https://drive.google.com/drive/u/0/folders/1HSVZWZrUdqyLBHiBkmzkg7AJ21JYez4E
+
+# Change Hostname
+
+hostnamectl set-hostname 'stic-sbc-001'
