@@ -18,11 +18,7 @@ The `Frame` class has caching build in to avoid double decompression or conversi
 
 # Dependencies Linux
 
-Follow the instructions on the (BRICS)[https://github.com/brown-ivl/brics] project to install python with Anaconda. Then install these:
-
-```
-conda install -c conda-forge cython pkgconfig
-```
+Make sure to follow the same order!
 
 ### libuvc
 ```
@@ -44,6 +40,13 @@ cd libjpeg-turbo-1.5.1
 sudo make install
 sudo ldconfig
 ```
+
+Follow the instructions on the (BRICS)[https://github.com/brown-ivl/brics] project to install python with Anaconda. Then install these:
+
+```
+conda install -c conda-forge cython pkgconfig
+```
+
 
 ### OpenCV
 
