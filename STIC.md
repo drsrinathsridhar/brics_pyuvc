@@ -24,6 +24,7 @@ Here's the CMAKE command. Please replace `ENV_PATH` with the path of the python 
 For instance, first run
 
 `ENV_PATH=/home/srinath/anaconda3/envs/napier`
+`PYTHON_VERSION=3.7`
 
 Then do
 
@@ -44,10 +45,10 @@ cmake \
 -D BUILD_opencv_python2=OFF \
 -D BUILD_opencv_python3=ON \
 -D PYTHON3_EXECUTABLE=$ENV_PATH/bin/python \
--D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python3.7m \
--D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython3.7m.so \
--D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python3.7/site-packages \
--D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python3.7/site-packages/numpy/core/include \
+-D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python$PYTHON_VERSIONm \
+-D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython$PYTHON_VERSIONm.so \
+-D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python$PYTHON_VERSION/site-packages \
+-D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python$PYTHON_VERSION/site-packages/numpy/core/include \
 -D WITH_GSTREAMER=OFF \
 ..
 ```
