@@ -14,7 +14,7 @@ Get OpenCV:
 
 First build OpenCV 3.4+ with highgui and Python 3 support. First install some prerequisites:
 
-`sudo apt install ffmpeg qt5-default libgtk2.0-dev libgtk-3-dev`
+`sudo apt install ffmpeg qt5-default libgtk2.0-dev libgtk-3-dev libpng-dev`
 
 (On Ubuntu 22.04 try `sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools` instead of `qt5-default`).
 (On Odroid Ubuntu Mate 20.04, try `sudo apt -o Dpkg::Options::="--force-overwrite" install ffmpeg`
