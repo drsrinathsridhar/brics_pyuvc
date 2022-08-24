@@ -44,7 +44,7 @@ sudo ldconfig
 ### cython
 ```
 sudo pip install cython
-conda install -c conda-forge cython
+conda install -c conda-forge cython pkgconfig
 ```
 
 ### udev rules for running as normal user:
