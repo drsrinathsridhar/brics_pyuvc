@@ -85,7 +85,7 @@ cmake \
 -D BUILD_opencv_python2=OFF \
 -D BUILD_opencv_python3=ON \
 -D PYTHON3_EXECUTABLE=$ENV_PATH/bin/python \
--D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python${PYTHON_VERSION} \
+-D PYTHON3_INCLUDE_DIR=$ENV_PATH/include/python${PYTHON_VERSION}m \
 -D PYTHON3_LIBRARY=$ENV_PATH/lib/libpython${PYTHON_VERSION}m.so \
 -D PYTHON3_PACKAGES_PATH=$ENV_PATH/lib/python$PYTHON_VERSION/site-packages \
 -D PYTHON3_NUMPY_INCLUDE_DIRS=$ENV_PATH/lib/python$PYTHON_VERSION/site-packages/numpy/core/include \
