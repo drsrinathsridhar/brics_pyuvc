@@ -44,6 +44,7 @@ sudo ldconfig
 ### cython
 ```
 sudo pip install cython
+conda install -c conda-forge cython
 ```
 
 ### udev rules for running as normal user:
@@ -74,6 +75,7 @@ brew install libjpeg-turbo
 ```
 pip install cython
 pip install numpy
+conda install -c conda-forge pkgconfig
 ```
 
 ## just build locally
