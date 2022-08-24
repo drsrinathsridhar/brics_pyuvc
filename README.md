@@ -1,7 +1,9 @@
-pyuvc
-=======
+brics_pyuvc
+============
 
-Python bindings for the Pupil Labs fork of [libuvc](https://github.com/pupil-labs/libuvc) with super fast jpeg decompression using [libjpegturbo](http://libjpeg-turbo.virtualgl.org/) (utilizing the tubojpeg api).
+`brics_pyuvc` is a fork of [pupil-labs/pyuvc](https://github.com/pupil-labs/pyuvc) specifically modified for the (BRICS)[https://github.com/brown-ivl/brics] project. * Only Ubunutu is supported for now*.
+
+`pyuvc` is a set of Python bindings for the Pupil Labs fork of [libuvc](https://github.com/pupil-labs/libuvc) with super fast jpeg decompression using [libjpegturbo](http://libjpeg-turbo.virtualgl.org/) (utilizing the tubojpeg api).
 
 * cross platform access to UVC capture devices.
 * Full access to all uvc settings (Zoom,Focus,Brightness,etc.)
