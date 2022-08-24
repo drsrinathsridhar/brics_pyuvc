@@ -16,11 +16,15 @@ This gives the user the full flexiblity: Grab just the jpeg buffers or have them
 
 The `Frame` class has caching build in to avoid double decompression or conversion.
 
-
-# Example
-See `example.py` for an code example.
-
 # Dependencies Linux
+
+Follow the instructions on the (BRICS)[https://github.com/brown-ivl/brics] project to install python with Anaconda and dependencies.
+
+### Extra Dependencies
+```
+sudo pip install cython
+conda install -c conda-forge cython pkgconfig
+```
 
 ### libuvc
 ```
@@ -43,44 +47,13 @@ sudo make install
 sudo ldconfig
 ```
 
-### cython
-```
-sudo pip install cython
-conda install -c conda-forge cython pkgconfig
-```
-
 ### udev rules for running as normal user:
 ```
 echo 'SUBSYSTEM=="usb",  ENV{DEVTYPE}=="usb_device", GROUP="plugdev", MODE="0664"' | sudo tee /etc/udev/rules.d/10-libuvc.rules > /dev/null
 sudo udevadm trigger
 ```
 
-# Dependencies Mac
-
-### libuvc
-```
-git clone https://github.com/pupil-labs/libuvc
-cd libuvc
-mkdir build
-cd build
-cmake ..
-make && sudo make install
-```
-
-### libjpeg-turbo
-
-```
-brew install libjpeg-turbo
-```
-
-### cython,numpy
-```
-pip install cython
-pip install numpy
-conda install -c conda-forge pkgconfig
-```
-
-## just build locally
+## Build Locally
 ```
 python setup.py build_ext -i
 ```
@@ -89,8 +62,3 @@ python setup.py build_ext -i
 ```
 python setup.py install
 ```
-
-# WINDOWS
-
-Please have a look at WINDOWS_USER.md for install instructions if you want to use PYUVC.
-Please have a look at WINDOWS_DEVELOER.md for install instructions if you want to modify PYUVC.
