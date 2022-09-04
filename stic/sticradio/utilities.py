@@ -1,5 +1,4 @@
 from datetime import datetime
-import cv2
 import math
 import numpy as np
 
@@ -7,6 +6,7 @@ def getCurrentEpochTime():
     return int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() * 1e6)
 
 def makeCollage(ImageList, MaxWidth=800, FPSList=[]):
+    import cv2
     if ImageList is None:
         return None
 
