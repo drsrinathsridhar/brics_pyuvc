@@ -25,4 +25,4 @@ Modified Ubuntu STIC images are at https://drive.google.com/drive/u/0/folders/1H
 
 # Change Hostname
 
-hostnamectl set-hostname 'stic-sbc-001'
+`hostnamectl set-hostname 'stic-sbc-001'`
