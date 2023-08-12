@@ -560,7 +560,8 @@ cdef class Capture:
 
 
     def stop_stream(self):
-        self._stop()
+        if self._stream_on:
+            self._stop()
 
     cdef _stop(self):
         cdef int status = 0
