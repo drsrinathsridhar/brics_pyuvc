@@ -565,9 +565,9 @@ cdef class Capture:
 
     cdef _stop(self):
         cdef int status = 0
-        print('in _stop()'
+        print('in _stop()')
         status = uvc.uvc_stream_stop(self.strmh)
-        print('in uvc_stream_stop()'
+        print('in uvc_stream_stop()')
         if status != uvc.UVC_SUCCESS:
             #raise Exception("Can't stop  stream: Error:'%s'."%uvc_error_codes[status])
             logger.error("Can't stop stream: Error:'%s'. Will ignore this and try to continue."%uvc_error_codes[status])
