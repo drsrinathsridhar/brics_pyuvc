@@ -525,8 +525,8 @@ cdef class Capture:
         if self._stream_on:
             self._stop()
         print('pyuvc: Stop done...')
-        self._re_init_device()
-        print('pyuvc: re_init done...')
+        # self._re_init_device()
+        # print('pyuvc: re_init done...')
         self._start()
         print('pyuvc: Start done. Restart complete.')
 
