@@ -575,7 +575,7 @@ cdef class Capture:
         else:
             logger.debug("Stream stopped")
             print("Stream stopped")
-        uvc.uvc_stream_close(self.strmh)
+        # uvc.uvc_stream_close(self.strmh)
         logger.debug("Stream closed")
         print("Stream closed")
         self._stream_on = 0
