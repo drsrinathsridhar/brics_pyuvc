@@ -517,6 +517,8 @@ cdef class Capture:
         self.dev = NULL
         logger.debug('UVC device closed.')
 
+    def restart(self):
+        self._restart()
 
     cdef _restart(self):
         self._stop()
