@@ -521,14 +521,14 @@ cdef class Capture:
         self._restart()
 
     cdef _restart(self):
-        print('pyuvc: Restarting...')
+        # print('pyuvc: Restarting...')
         if self._stream_on:
             self._stop()
-        print('pyuvc: Stop done...')
+        # print('pyuvc: Stop done...')
         # self._re_init_device()
         # print('pyuvc: re_init done...')
         self._start()
-        print('pyuvc: Start done. Restart complete.')
+        # print('pyuvc: Start done. Restart complete.')
 
     cdef _configure_stream(self,mode=(640,480,30)):
         cdef int status
