@@ -569,12 +569,16 @@ cdef class Capture:
         if status != uvc.UVC_SUCCESS:
             #raise Exception("Can't stop  stream: Error:'%s'."%uvc_error_codes[status])
             logger.error("Can't stop stream: Error:'%s'. Will ignore this and try to continue."%uvc_error_codes[status])
+            print("Can't stop stream: Error:'%s'. Will ignore this and try to continue."%uvc_error_codes[status])
         else:
             logger.debug("Stream stopped")
+            print("Stream stopped")
         uvc.uvc_stream_close(self.strmh)
         logger.debug("Stream closed")
+        print("Stream closed")
         self._stream_on = 0
         logger.debug("Stream stop.")
+        print("Stream stop.")
 
     def get_frame_robust(self):
         cdef int a,attempts = 3
