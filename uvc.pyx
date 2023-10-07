@@ -558,7 +558,9 @@ cdef class Capture:
         self._stream_on = 1
         logger.debug("Stream start.")
 
-
+    def start_stream(self):
+        self._start()
+    
     def stop_stream(self):
         if self._stream_on:
             self._stop()
