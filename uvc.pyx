@@ -575,10 +575,8 @@ cdef class Capture:
             logger.debug("Stream stopped")
         uvc.uvc_stream_close(self.strmh)
         logger.debug("Stream closed")
-        print('stream closed')
         self._stream_on = 0
         logger.debug("Stream stop.")
-        print('stream stoppped')
 
     def get_frame_robust(self):
         cdef int a,attempts = 3
